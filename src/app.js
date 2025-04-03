@@ -6,6 +6,7 @@ const app=express();
 const bcrypt = require("bcrypt"); 
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
+const userAuth = require("./middlewares/auth");
 
 // const {adminAuth, userAuth} = require("./middlewares/auth");
 
@@ -152,39 +153,46 @@ catch(err){
 });
    
 
-app.get("/profile", async(req,res)=>{
-    try {
-        // Read cookies from the request
-        const cookies = req.cookies;
-        console.log("Cookies:", cookies); 
+// app.get("/profile", async(req,res)=>{
+//     try {
+//         // Read cookies from the request
+//         const cookies = req.cookies;
+//         console.log("Cookies:", cookies); 
 
-        const { token } = cookies;
-        if(!token){
-            throw new Error("Token not found in cookies");
-        }
-        console.log("Token:", token); 
-        // Verify the token
-        const decodedmsg = await jwt.verify(token, "SagarDevTinder");
-        const _id = decodedmsg._id;
-        console.log("Decoded ID:", _id); // Log the decoded ID
-        console.log("Decoded JWT:", decodedmsg); // Log the decoded token
-        const user = await User.findById(_id);
-        if(!user){
-            throw new Error("User not found");
-        }
-        res.send("User:"+ user); // Log the user object
+//         const { token } = cookies;
+//         if(!token){
+//             throw new Error("Token not found in cookies");
+//         }
+//         console.log("Token:", token); 
+//         // Verify the token
+//         const decodedmsg = await jwt.verify(token, "SagarDevTinder");
+//         const _id = decodedmsg._id;
+//         console.log("Decoded ID:", _id); // Log the decoded ID
+//         console.log("Decoded JWT:", decodedmsg); // Log the decoded token
+//         const user = await User.findById(_id);
+//         if(!user){
+//             throw new Error("User not found");
+//         }
+//         res.send(user); // Log the user object
 
-        res.send("Profile accessed successfully");
-    }
+//         res.send("Profile accessed successfully");
+//     }
  
-catch(err){
-    console.error("Error fetching profile:", err);
-    res.status(500).send("An error occurred while fetching the profile.");
-}
+// catch(err){
+//     console.error("Error fetching profile:", err);
+//     res.status(500).send("An error occurred while fetching the profile.");
+// }
+// });
+
+app.get("/profile", userAuth, async (req, res) => {
+    try {
+        const user = req.user; // Access the authenticated user
+        res.send(user);
+    } catch (err) {
+        console.error("Error fetching profile:", err);
+        res.status(500).send("An error occurred while fetching the profile.");
+    }
 });
-
-
-
 // update user by id
 connectDB()
 .then(()=>{

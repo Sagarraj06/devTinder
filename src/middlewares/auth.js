@@ -1,22 +1,25 @@
-const adminAuth= (req,res,next)=>{
-    const token = "xyz";
-    const isAdminAuth = token==="xyz";
-    if(!isAdminAuth){
-        return res.status(401).send("Unauthorized");
-    }
-    else{
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+
+const userAuth = async (req, res, next) => {
+    try {
+        const { token } = req.cookies;
+        if (!token) {
+            throw new Error("Token not found in cookies");
+        }
+        const decodedmsg = await jwt.verify(token, "SagarDevTinder");
+        const _id = decodedmsg._id;
+        const user = await User.findById(_id);
+        if (!user) {
+            throw new Error("User not found");
+        }
+        req.user = user;
         next();
+    } catch (error) {
+        console.log(error);
+        res.status(401).send("Unauthorized access");
     }
 };
 
-const userAuth = (req,res,next)=>{
-    const token = "abc";
-    const isUserAuth = token==="abc";
-    if(!isUserAuth){
-        return res.status(401).send("Unauthorized");
-    }
-    else{
-        next();
-    }
-}
-module.exports = {adminAuth, userAuth};
+// Export directly
+module.exports = userAuth;
