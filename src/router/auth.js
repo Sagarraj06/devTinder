@@ -56,4 +56,24 @@ catch(err){
 }
 });
 
+
+router.post("/logout", (req,res)=>{
+    try{
+        res.clearCookie("token");
+        res.send("logout successful");
+    }
+    catch(err){
+        res.status(500).send("Error logging out :" + err.message);
+    }
+});
+
+// router.post("/logout", async (req, res) =>{
+//       res.cookie("token", null,{
+//         expires: new Date(date.now()),
+
+//       });
+//         res.send("Logout successful");
+// });
+
+ 
 module.exports= router;
